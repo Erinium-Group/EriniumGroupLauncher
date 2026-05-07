@@ -97,12 +97,98 @@
     });
   }
 
+  // ---- Minecraft color/format codes parser ----
+  // Parses strings containing Minecraft formatting codes (§ or &) and returns
+  // safe HTML with inline styles. Supports colors §0-9a-f, formats §l/m/n/o, reset §r.
+  // The plain text content is HTML-escaped so the input is safe to render.
+  var MC_COLORS = {
+    '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+    '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+    '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+    'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF'
+  };
+
+  function escapeHtmlChars(text) {
+    return text.replace(/[&<>"']/g, function (c) {
+      return ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[c];
+    });
+  }
+
+  function parseMcCodes(input) {
+    if (input == null) return '';
+    var str = String(input);
+    // Normalize section sign and ampersand to a single placeholder
+    var normalized = str.replace(/§/g, '§').replace(/&([0-9a-fk-orA-FK-OR])/g, '§$1');
+
+    var html = '';
+    var color = null;
+    var bold = false;
+    var italic = false;
+    var underline = false;
+    var strike = false;
+    var openSpan = false;
+    var buf = '';
+
+    function flushBuf() {
+      if (buf.length === 0) return;
+      var styles = [];
+      if (color) styles.push('color:' + color);
+      if (bold) styles.push('font-weight:700');
+      if (italic) styles.push('font-style:italic');
+      var deco = [];
+      if (underline) deco.push('underline');
+      if (strike) deco.push('line-through');
+      if (deco.length > 0) styles.push('text-decoration:' + deco.join(' '));
+      if (styles.length > 0) {
+        html += '<span style="' + styles.join(';') + '">' + escapeHtmlChars(buf) + '</span>';
+      } else {
+        html += escapeHtmlChars(buf);
+      }
+      buf = '';
+      openSpan = false;
+    }
+
+    for (var i = 0; i < normalized.length; i++) {
+      var ch = normalized.charAt(i);
+      if (ch === '§' && i + 1 < normalized.length) {
+        var code = normalized.charAt(i + 1).toLowerCase();
+        flushBuf();
+        if (MC_COLORS[code]) {
+          color = MC_COLORS[code];
+          // Color code resets formatting in vanilla Minecraft
+          bold = false; italic = false; underline = false; strike = false;
+        } else if (code === 'l') {
+          bold = true;
+        } else if (code === 'o') {
+          italic = true;
+        } else if (code === 'n') {
+          underline = true;
+        } else if (code === 'm') {
+          strike = true;
+        } else if (code === 'r') {
+          color = null; bold = false; italic = false; underline = false; strike = false;
+        }
+        // 'k' (obfuscated) is ignored — render as-is
+        i++; // skip the code char
+        continue;
+      }
+      buf += ch;
+      openSpan = true;
+    }
+    flushBuf();
+    return html;
+  }
+
   // ---- Profile ----
   function loadProfile() {
     window.launcher.auth.getSession().then(function (session) {
       if (session && session.valid && session.user) {
         var user = session.user;
-        playerName.textContent = user.mcName || 'Joueur';
+        // Default rendering from the cached session (no rank prefix yet).
+        // The rank prefix is fetched separately below from the live API.
+        playerName.innerHTML = escapeHtmlChars(user.mcName || 'Joueur');
         playerDiscord.textContent = user.discordName || '';
 
         // Avatar (URL complète depuis le site, ou reconstruit depuis discordId + hash)
@@ -114,17 +200,6 @@
           }
         }
 
-        // Rank
-        if (user.rank) {
-          var badge = playerRank.querySelector('.rank-badge');
-          badge.textContent = user.rank;
-          if (user.rankColor) {
-            badge.style.color = user.rankColor;
-            badge.style.borderColor = user.rankColor + '4D';
-            badge.style.background = user.rankColor + '1A';
-          }
-        }
-
         // Stats
         playerFaction.textContent = user.faction || 'Aucune';
         playerKills.textContent = (user.kills || 0).toString();
@@ -133,8 +208,71 @@
         var kills = user.kills || 0;
         var kd = deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2);
         playerKD.textContent = kd;
+
+        // Fetch the live rank prefix and update the display.
+        loadRankPrefix(user.mcName || 'Joueur');
       }
     });
+  }
+
+  // Fetches the player profile (MC name + rank prefix) from the site API
+  // and renders the rank prefix in front of the player name. Falls back to
+  // showing just the MC name if anything fails.
+  function loadRankPrefix(fallbackName) {
+    window.launcher.auth.getProfile().then(function (profile) {
+      if (!profile) {
+        playerName.innerHTML = escapeHtmlChars(fallbackName);
+        return;
+      }
+
+      var mcName = profile.mcName || fallbackName;
+      var prefix = profile.prefix || '';
+      var rankName = profile.rankName || '';
+      var color = profile.color || '';
+
+      // Render: <prefix><colored mc name>
+      // If a rank color is provided, color the player name with it (after the prefix).
+      var nameHtml;
+      if (color) {
+        nameHtml = parseMcCodes(color + mcName);
+      } else {
+        nameHtml = escapeHtmlChars(mcName);
+      }
+      playerName.innerHTML = parseMcCodes(prefix) + nameHtml;
+
+      // Update the rank badge with the parsed rank name.
+      var badge = playerRank.querySelector('.rank-badge');
+      if (rankName) {
+        badge.innerHTML = parseMcCodes(rankName);
+        // Apply the rank color to the badge background/border too.
+        if (color) {
+          var hex = mcCodeToHex(color);
+          if (hex) {
+            badge.style.color = hex;
+            badge.style.borderColor = hex + '4D';
+            badge.style.background = hex + '1A';
+          }
+        }
+      } else {
+        badge.textContent = 'Joueur';
+      }
+    }).catch(function () {
+      playerName.innerHTML = escapeHtmlChars(fallbackName);
+    });
+  }
+
+  // Returns the hex color of the LAST color code found in the string, or null.
+  function mcCodeToHex(str) {
+    if (!str) return null;
+    var normalized = String(str).replace(/&([0-9a-fA-F])/g, '§$1');
+    var lastHex = null;
+    for (var i = 0; i < normalized.length - 1; i++) {
+      if (normalized.charAt(i) === '§') {
+        var c = normalized.charAt(i + 1).toLowerCase();
+        if (MC_COLORS[c]) lastHex = MC_COLORS[c];
+      }
+    }
+    return lastHex;
   }
 
   // ---- Server Status ----

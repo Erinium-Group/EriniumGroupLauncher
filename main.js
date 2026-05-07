@@ -167,12 +167,16 @@ function getUser() {
 // ---------------------------------------------------------------------------
 // HTTP helpers
 // ---------------------------------------------------------------------------
-function fetchJSON(urlStr) {
+function fetchJSON(urlStr, headers) {
   return new Promise((resolve) => {
     function doFetch(reqUrl, redirectCount) {
       if (redirectCount > 5) return resolve(null);
       var mod = reqUrl.startsWith('https') ? https : http;
-      var req = mod.get(reqUrl, { timeout: 8000 }, (res) => {
+      var options = { timeout: 8000 };
+      if (headers && typeof headers === 'object') {
+        options.headers = headers;
+      }
+      var req = mod.get(reqUrl, options, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           var loc = res.headers.location;
           if (!loc.startsWith('http')) {
@@ -2043,6 +2047,18 @@ function registerIpcHandlers() {
   ipcMain.handle('auth:logout', async () => {
     clearTokens();
     return { success: true };
+  });
+
+  // Fetch the up-to-date launcher profile (MC name + rank prefix) from the site.
+  // Returns null if the user is not authenticated or the site is unreachable.
+  ipcMain.handle('auth:get-profile', async () => {
+    const jwt = getToken('jwt');
+    if (!jwt) return null;
+    const data = await fetchJSON(SITE_URL + '/api/launcher/profile', {
+      'Authorization': 'Bearer ' + jwt,
+      'Accept': 'application/json',
+    });
+    return data;
   });
 
   // App

@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('launcher', {
     startDiscord: () => ipcRenderer.invoke('auth:start-discord'),
     devLogin: () => ipcRenderer.invoke('auth:dev-login'),
     getSession: () => ipcRenderer.invoke('auth:get-session'),
+    getProfile: () => ipcRenderer.invoke('auth:get-profile'),
     logout: () => ipcRenderer.invoke('auth:logout'),
     onToken: (cb) => ipcRenderer.on('auth:token-received', (_e, data) => cb(data)),
     onError: (cb) => ipcRenderer.on('auth:error', (_e, data) => cb(data)),
