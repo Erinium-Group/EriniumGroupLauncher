@@ -1,10 +1,10 @@
 {
-  "name": "eriniumfaction-launcher",
+  "name": "eriniumgroup-launcher",
   "version": "1.2.0",
-  "description": "Launcher officiel EriniumFaction",
+  "description": "Launcher officiel EriniumGroup",
   "author": {
     "name": "EriniumGroup",
-    "email": "contact@eriniumfaction.fr"
+    "email": "contact@eriniumgroup.fr"
   },
   "main": "main.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "fr.eriniumgroup.launcher",
-    "productName": "EriniumFaction",
+    "productName": "EriniumGroup",
     "asar": true,
     "forceCodeSigning": false,
     "win": {
@@ -44,7 +44,7 @@
     "publish": {
       "provider": "github",
       "owner": "Erinium-Group",
-      "repo": "EriniumFaction-Launcher"
+      "repo": "EriniumGroupLauncher"
     }
   },
   "type": "commonjs",

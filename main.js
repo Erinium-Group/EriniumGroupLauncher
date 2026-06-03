@@ -18,7 +18,7 @@ const { Launch } = require('minecraft-java-core');
 // Use APPDATA directly instead of app.getPath() which may not be ready yet
 var LOG_DIR = path.join(
   process.env.APPDATA || process.env.HOME || os.homedir(),
-  'eriniumfaction-launcher', 'logs'
+  'eriniumgroup-launcher', 'logs'
 );
 var LOG_FILE = path.join(LOG_DIR, 'launcher.log');
 var logStream = null;
@@ -58,7 +58,7 @@ console.log = function () { origLog.apply(console, arguments); logToFile('INFO',
 console.warn = function () { origWarn.apply(console, arguments); logToFile('WARN', arguments); };
 console.error = function () { origError.apply(console, arguments); logToFile('ERROR', arguments); };
 
-console.log('=== EriniumFaction Launcher started ===');
+console.log('=== EriniumGroup Launcher started ===');
 console.log('Version: ' + require('./package.json').version);
 console.log('Platform: ' + process.platform + ' ' + process.arch);
 console.log('Packaged: ' + app.isPackaged);
@@ -67,11 +67,11 @@ console.log('Log file: ' + LOG_FILE);
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
-const SITE_URL = 'https://eriniumfaction.vercel.app';
+const SITE_URL = 'https://eriniumgroup.vercel.app';
 const MANIFEST_URL = SITE_URL + '/api/launcher/manifest';
 const APP_VERSION = require('./package.json').version;
 const MC_VERSION = '1.12.2';
-const GAME_DIR = path.join(app.getPath('appData'), '.eriniumfaction');
+const GAME_DIR = path.join(app.getPath('appData'), '.eriniumgroup');
 const MC_DIR = path.join(GAME_DIR, 'minecraft');
 const MAX_CONCURRENT_DOWNLOADS = 4;
 const MAX_RETRIES = 3;
@@ -307,7 +307,7 @@ function startOAuthCallbackServer() {
 
         // Send a nice HTML page to the browser
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>EriniumFaction</title>
+        res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>EriniumGroup</title>
           <style>body{background:#0A0A12;color:#F0F2FF;font-family:Inter,sans-serif;display:flex;
           align-items:center;justify-content:center;height:100vh;margin:0;}
           .box{text-align:center;}.ok{color:#2ECC71;font-size:24px;font-weight:700;}
@@ -446,7 +446,7 @@ function findJavaExecutables() {
   }
 
   // Our own downloaded Java (all platforms)
-  var ownJavaDir = path.join(app.getPath('appData'), '.eriniumfaction', 'java');
+  var ownJavaDir = path.join(app.getPath('appData'), '.eriniumgroup', 'java');
 
   // Platform-specific search directories
   var searchDirs = [ownJavaDir];
@@ -634,7 +634,7 @@ async function extractArchive(archivePath, destDir) {
 }
 
 async function downloadAndInstallJava(senderWebContents) {
-  var javaBaseDir = path.join(app.getPath('appData'), '.eriniumfaction', 'java');
+  var javaBaseDir = path.join(app.getPath('appData'), '.eriniumgroup', 'java');
 
   // Create directory
   try {
@@ -855,19 +855,19 @@ async function compareManifests(remote, local) {
   }
 
   // Check each remote file against what's actually on disk
-  console.log('[EriniumFaction] Comparing ' + remote.files.length + ' remote files against local disk...');
+  console.log('[EriniumGroup] Comparing ' + remote.files.length + ' remote files against local disk...');
   for (var j = 0; j < remote.files.length; j++) {
     var remoteFile = remote.files[j];
     var fullPath = path.join(GAME_DIR, remoteFile.path);
 
     if (!fs.existsSync(fullPath)) {
-      console.log('[EriniumFaction]   MISSING: ' + remoteFile.path);
+      console.log('[EriniumGroup]   MISSING: ' + remoteFile.path);
       toDownload.push(remoteFile);
     } else {
       var localHash = await hashFile(fullPath);
       if (localHash !== remoteFile.sha256) {
         var localSize = fs.statSync(fullPath).size;
-        console.log('[EriniumFaction]   CHANGED: ' + remoteFile.path + ' (local: ' + localSize + 'b/' + localHash.substring(0, 12) + '... remote: ' + remoteFile.size + 'b/' + remoteFile.sha256.substring(0, 12) + '...)');
+        console.log('[EriniumGroup]   CHANGED: ' + remoteFile.path + ' (local: ' + localSize + 'b/' + localHash.substring(0, 12) + '... remote: ' + remoteFile.size + 'b/' + remoteFile.sha256.substring(0, 12) + '...)');
         toDownload.push(remoteFile);
       }
     }
@@ -875,7 +875,7 @@ async function compareManifests(remote, local) {
     // Remove from localMap so we can find deletions
     delete localMap[remoteFile.path];
   }
-  console.log('[EriniumFaction] Result: ' + toDownload.length + ' to download, checking deletions...');
+  console.log('[EriniumGroup] Result: ' + toDownload.length + ' to download, checking deletions...');
 
   // Files in local but not in remote should be deleted (for mods/ only)
   var remainingKeys = Object.keys(localMap);
@@ -1077,7 +1077,7 @@ async function downloadManifestFiles(files, webContents) {
           completedFiles++;
         }).catch(function (err) {
           errors.push({ file: file.path, error: err.message });
-          console.error('[EriniumFaction] Echec telechargement ' + file.path + ':', err.message);
+          console.error('[EriniumGroup] Echec telechargement ' + file.path + ':', err.message);
         });
 
         promises.push(promise);
@@ -1127,26 +1127,26 @@ async function syncOptionalMods(manifest, settings) {
     if (isEnabled) {
       // Download if not present or hash mismatch
       if (!fs.existsSync(localPath)) {
-        console.log('[EriniumFaction] Downloading optional mod: ' + fileName);
+        console.log('[EriniumGroup] Downloading optional mod: ' + fileName);
         if (mod.url) {
           try {
             await downloadFile(mod.url, localPath);
-            console.log('[EriniumFaction] Optional mod downloaded: ' + fileName);
+            console.log('[EriniumGroup] Optional mod downloaded: ' + fileName);
           } catch (err) {
-            console.warn('[EriniumFaction] Failed to download optional mod: ' + fileName, err.message);
+            console.warn('[EriniumGroup] Failed to download optional mod: ' + fileName, err.message);
           }
         }
       } else {
         // Verify hash
         var localHash = await hashFile(localPath);
         if (localHash !== mod.sha256) {
-          console.log('[EriniumFaction] Optional mod hash mismatch, re-downloading: ' + fileName);
+          console.log('[EriniumGroup] Optional mod hash mismatch, re-downloading: ' + fileName);
           try { fs.unlinkSync(localPath); } catch (e) {}
           if (mod.url) {
             try {
               await downloadFile(mod.url, localPath);
             } catch (err) {
-              console.warn('[EriniumFaction] Failed to re-download optional mod: ' + fileName, err.message);
+              console.warn('[EriniumGroup] Failed to re-download optional mod: ' + fileName, err.message);
             }
           }
         }
@@ -1156,9 +1156,9 @@ async function syncOptionalMods(manifest, settings) {
       if (fs.existsSync(localPath)) {
         try {
           fs.unlinkSync(localPath);
-          console.log('[EriniumFaction] Optional mod removed: ' + fileName);
+          console.log('[EriniumGroup] Optional mod removed: ' + fileName);
         } catch (e) {
-          console.warn('[EriniumFaction] Could not remove optional mod: ' + fileName, e.message);
+          console.warn('[EriniumGroup] Could not remove optional mod: ' + fileName, e.message);
         }
       }
     }
@@ -1202,13 +1202,13 @@ function enforceModsWhitelist(manifest, gameDir) {
       try {
         fs.unlinkSync(src);
         movedFiles.push(entry);
-        console.log('[EriniumFaction] Mod non autorise SUPPRIME: ' + entry);
+        console.log('[EriniumGroup] Mod non autorise SUPPRIME: ' + entry);
       } catch (e) {
-        console.warn('[EriniumFaction] Impossible de supprimer ' + entry + ':', e.message);
+        console.warn('[EriniumGroup] Impossible de supprimer ' + entry + ':', e.message);
       }
     }
   } catch (e) {
-    console.warn('[EriniumFaction] Erreur lors du scan du dossier mods/:', e.message);
+    console.warn('[EriniumGroup] Erreur lors du scan du dossier mods/:', e.message);
   }
 
   return movedFiles;
@@ -1223,10 +1223,10 @@ function deleteRemovedFiles(filesToDelete) {
     try {
       if (fs.existsSync(fullPath)) {
         fs.unlinkSync(fullPath);
-        console.log('[EriniumFaction] Fichier supprime (retire du manifeste): ' + filesToDelete[i].path);
+        console.log('[EriniumGroup] Fichier supprime (retire du manifeste): ' + filesToDelete[i].path);
       }
     } catch (e) {
-      console.warn('[EriniumFaction] Impossible de supprimer ' + filesToDelete[i].path + ':', e.message);
+      console.warn('[EriniumGroup] Impossible de supprimer ' + filesToDelete[i].path + ':', e.message);
     }
   }
 }
@@ -1328,7 +1328,7 @@ function downloadMinecraftVanilla(webContents, settings) {
     });
 
     launcher.on('error', function (err) {
-      console.error('[EriniumFaction] MC download error:', err);
+      console.error('[EriniumGroup] MC download error:', err);
       reject(new Error(err.error || err.message || 'Erreur telechargement Minecraft'));
     });
 
@@ -1417,7 +1417,7 @@ function isCleanRoomInstalled(manifest) {
  */
 async function installCleanRoom(manifest, webContents, javaPath) {
   if (!manifest || !manifest.cleanroomUrl) {
-    console.log('[EriniumFaction] Pas d\'URL CleanRoom dans le manifeste, skip');
+    console.log('[EriniumGroup] Pas d\'URL CleanRoom dans le manifeste, skip');
     return;
   }
 
@@ -1454,12 +1454,12 @@ async function installCleanRoom(manifest, webContents, javaPath) {
       for (var vi = 0; vi < versionEntries.length; vi++) {
         if (versionEntries[vi].startsWith('cleanroom-') && versionEntries[vi] !== 'cleanroom-' + manifest.cleanroom) {
           var oldDir = path.join(versionsDir, versionEntries[vi]);
-          console.log('[EriniumFaction] Deleting old CleanRoom version: ' + versionEntries[vi]);
+          console.log('[EriniumGroup] Deleting old CleanRoom version: ' + versionEntries[vi]);
           fs.rmSync(oldDir, { recursive: true, force: true });
         }
       }
     } catch (e) {
-      console.warn('[EriniumFaction] Failed to clean old CleanRoom versions:', e.message);
+      console.warn('[EriniumGroup] Failed to clean old CleanRoom versions:', e.message);
     }
   }
 
@@ -1471,7 +1471,7 @@ async function installCleanRoom(manifest, webContents, javaPath) {
 
   // Run the installer: java -jar installer.jar --installClient GAME_DIR
   sendProgress(webContents, 'Installation de CleanRoom...', 50, 'Execution de l\'installateur...');
-  console.log('[EriniumFaction] Running CleanRoom installer: ' + javaExe + ' -jar ' + installerPath + ' --installClient ' + GAME_DIR);
+  console.log('[EriniumGroup] Running CleanRoom installer: ' + javaExe + ' -jar ' + installerPath + ' --installClient ' + GAME_DIR);
 
   await new Promise(function (resolve, reject) {
     var proc = spawn(javaExe, ['-jar', installerPath, '--installClient', GAME_DIR], {
@@ -1499,12 +1499,12 @@ async function installCleanRoom(manifest, webContents, javaPath) {
 
     proc.on('close', function (code) {
       if (code === 0) {
-        console.log('[EriniumFaction] CleanRoom installer termine avec succes');
+        console.log('[EriniumGroup] CleanRoom installer termine avec succes');
         resolve();
       } else {
-        console.error('[EriniumFaction] CleanRoom installer echoue (code ' + code + ')');
-        console.error('[EriniumFaction] stdout:', stdout);
-        console.error('[EriniumFaction] stderr:', stderr);
+        console.error('[EriniumGroup] CleanRoom installer echoue (code ' + code + ')');
+        console.error('[EriniumGroup] stdout:', stdout);
+        console.error('[EriniumGroup] stderr:', stderr);
         reject(new Error('CleanRoom installer echoue (code ' + code + '). Verifiez les logs.'));
       }
     });
@@ -1515,7 +1515,7 @@ async function installCleanRoom(manifest, webContents, javaPath) {
   });
 
   sendProgress(webContents, 'CleanRoom installe !', 80, manifest.cleanroom);
-  console.log('[EriniumFaction] CleanRoom installe: ' + manifest.cleanroom);
+  console.log('[EriniumGroup] CleanRoom installe: ' + manifest.cleanroom);
 }
 
 /**
@@ -1542,15 +1542,15 @@ async function checkAndDownloadGame(webContents) {
 
   try {
     var mcData = await downloadMinecraftVanilla(webContents, settings);
-    console.log('[EriniumFaction] Minecraft vanilla OK');
+    console.log('[EriniumGroup] Minecraft vanilla OK');
   } catch (err) {
-    console.error('[EriniumFaction] Erreur MC vanilla:', err.message);
+    console.error('[EriniumGroup] Erreur MC vanilla:', err.message);
     // If MC files already exist locally, continue anyway
     var versionJsonPath = path.join(MC_DIR, 'versions', MC_VERSION, MC_VERSION + '.json');
     if (!fs.existsSync(versionJsonPath)) {
       throw new Error('Impossible de telecharger Minecraft 1.12.2: ' + err.message);
     }
-    console.log('[EriniumFaction] Fichiers MC locaux existants, on continue');
+    console.log('[EriniumGroup] Fichiers MC locaux existants, on continue');
   }
 
   // --- Step 2: Fetch remote manifest ---
@@ -1561,14 +1561,14 @@ async function checkAndDownloadGame(webContents) {
   var localManifest = loadLocalManifest();
 
   if (remoteManifest) {
-    console.log('[EriniumFaction] Remote manifest: v' + remoteManifest.version + ', ' + (remoteManifest.files ? remoteManifest.files.length : 0) + ' files');
+    console.log('[EriniumGroup] Remote manifest: v' + remoteManifest.version + ', ' + (remoteManifest.files ? remoteManifest.files.length : 0) + ' files');
   } else {
-    console.warn('[EriniumFaction] Remote manifest is NULL — offline mode');
+    console.warn('[EriniumGroup] Remote manifest is NULL — offline mode');
   }
   if (localManifest) {
-    console.log('[EriniumFaction] Local manifest: v' + localManifest.version + ', ' + (localManifest.files ? localManifest.files.length : 0) + ' files');
+    console.log('[EriniumGroup] Local manifest: v' + localManifest.version + ', ' + (localManifest.files ? localManifest.files.length : 0) + ' files');
   } else {
-    console.log('[EriniumFaction] No local manifest');
+    console.log('[EriniumGroup] No local manifest');
   }
 
   // --- Step 3: CleanRoom ---
@@ -1585,14 +1585,14 @@ async function checkAndDownloadGame(webContents) {
       try {
         await installCleanRoom(remoteManifest, webContents, javaPath);
       } catch (err) {
-        console.error('[EriniumFaction] Erreur installation CleanRoom:', err.message);
+        console.error('[EriniumGroup] Erreur installation CleanRoom:', err.message);
         // If CleanRoom files exist locally, continue
         if (!isCleanRoomInstalled(localManifest || remoteManifest)) {
           throw new Error('Impossible d\'installer CleanRoom: ' + err.message);
         }
       }
     } else {
-      console.log('[EriniumFaction] CleanRoom deja installe');
+      console.log('[EriniumGroup] CleanRoom deja installe');
     }
   }
 
@@ -1601,7 +1601,7 @@ async function checkAndDownloadGame(webContents) {
 
   if (!effectiveManifest) {
     // No manifest available at all — first launch offline
-    console.warn('[EriniumFaction] Aucun manifeste disponible');
+    console.warn('[EriniumGroup] Aucun manifeste disponible');
     sendProgress(webContents, 'Aucune mise a jour disponible', 100, 'Mode hors ligne');
   } else {
     // Filter out cleanroom/lib files since they were handled above
@@ -1632,7 +1632,7 @@ async function checkAndDownloadGame(webContents) {
 
       await downloadManifestFiles(comparison.toDownload, webContents);
     } else {
-      console.log('[EriniumFaction] Tous les fichiers sont a jour');
+      console.log('[EriniumGroup] Tous les fichiers sont a jour');
     }
 
     // Save manifest
@@ -1649,7 +1649,7 @@ async function checkAndDownloadGame(webContents) {
       var filePath = path.join(GAME_DIR, criticalFiles[i].path);
       var valid = await verifyFile(filePath, criticalFiles[i].sha256);
       if (!valid) {
-        console.warn('[EriniumFaction] Fichier critique invalide, re-telechargement: ' + criticalFiles[i].path);
+        console.warn('[EriniumGroup] Fichier critique invalide, re-telechargement: ' + criticalFiles[i].path);
         await downloadGameFile(criticalFiles[i].url, filePath, criticalFiles[i].sha256, null);
       }
     }
@@ -1679,7 +1679,7 @@ async function checkAndDownloadGame(webContents) {
     var userVersion = await getJavaVersion(finalJavaPath);
     detectedJavaMajor = getMajorVersion(userVersion);
     if (detectedJavaMajor < 25) {
-      console.log('[EriniumFaction] Configured Java is v' + detectedJavaMajor + ', need 25+. Ignoring.');
+      console.log('[EriniumGroup] Configured Java is v' + detectedJavaMajor + ', need 25+. Ignoring.');
       finalJavaPath = null;
     }
   }
@@ -1697,15 +1697,15 @@ async function checkAndDownloadGame(webContents) {
 
   // No Java 25+ found — auto-download
   if (!finalJavaPath) {
-    console.log('[EriniumFaction] No Java 25+ found. Downloading automatically...');
+    console.log('[EriniumGroup] No Java 25+ found. Downloading automatically...');
     sendProgress(webContents, 'Installation de Java 25...', 95, 'CleanRoom necessite Java 25');
     sendStatus(webContents, 'downloading', 'Installation de Java 25...');
     try {
       var javaResult = await downloadAndInstallJava(webContents);
       finalJavaPath = javaResult.path;
-      console.log('[EriniumFaction] Java 25 installed at: ' + finalJavaPath);
+      console.log('[EriniumGroup] Java 25 installed at: ' + finalJavaPath);
     } catch (err) {
-      console.error('[EriniumFaction] Failed to install Java 25: ' + err.message);
+      console.error('[EriniumGroup] Failed to install Java 25: ' + err.message);
       sendStatus(webContents, 'error', 'Impossible d\'installer Java 25 : ' + err.message);
       throw new Error('Java 25 est requis pour CleanRoom. Installation automatique echouee: ' + err.message);
     }
@@ -1752,7 +1752,7 @@ function readCleanRoomProfile(gameDir, manifest) {
   try {
     return JSON.parse(fs.readFileSync(profilePath, 'utf-8'));
   } catch (e) {
-    console.error('[EriniumFaction] Erreur lecture profil CleanRoom:', e.message);
+    console.error('[EriniumGroup] Erreur lecture profil CleanRoom:', e.message);
     return null;
   }
 }
@@ -1844,7 +1844,7 @@ function buildClasspath(mcDir, gameDir, manifest) {
         }
       }
     } catch (e) {
-      console.error('[EriniumFaction] Erreur lecture MC version JSON:', e.message);
+      console.error('[EriniumGroup] Erreur lecture MC version JSON:', e.message);
     }
   }
 
@@ -1953,9 +1953,9 @@ function launchGame(javaPath, token, settings, webContents, manifest) {
       args.push(tweakClass);
     }
 
-    console.log('[EriniumFaction] Lancement avec Java: ' + javaPath);
-    console.log('[EriniumFaction] Game dir: ' + gameDir);
-    console.log('[EriniumFaction] RAM: ' + ramMin + 'G - ' + ramMax + 'G');
+    console.log('[EriniumGroup] Lancement avec Java: ' + javaPath);
+    console.log('[EriniumGroup] Game dir: ' + gameDir);
+    console.log('[EriniumGroup] RAM: ' + ramMin + 'G - ' + ramMax + 'G');
 
     gameProcess = spawn(javaPath, args, {
       cwd: gameDir,
@@ -1974,13 +1974,13 @@ function launchGame(javaPath, token, settings, webContents, manifest) {
     });
 
     gameProcess.on('close', function (code) {
-      console.log('[EriniumFaction] Minecraft ferme avec code: ' + code);
+      console.log('[EriniumGroup] Minecraft ferme avec code: ' + code);
       gameProcess = null;
       sendStatus(webContents, 'closed', 'Jeu ferme (code ' + code + ')');
     });
 
     gameProcess.on('error', function (err) {
-      console.error('[EriniumFaction] Erreur lancement Java:', err.message);
+      console.error('[EriniumGroup] Erreur lancement Java:', err.message);
       gameProcess = null;
       reject(err);
       return;
@@ -2119,7 +2119,7 @@ function registerIpcHandlers() {
   // Game launch — full download, verify, launch flow
   ipcMain.handle('game:launch', async (event) => {
     var sender = event.sender;
-    console.log('[EriniumFaction] Game launch requested');
+    console.log('[EriniumGroup] Game launch requested');
 
     // Check if already playing
     if (gameProcess) {
@@ -2144,7 +2144,7 @@ function registerIpcHandlers() {
       await launchGame(javaPath, token, settings, sender, result.manifest);
       return { success: true };
     } catch (err) {
-      console.error('[EriniumFaction] Erreur game:launch:', err.message);
+      console.error('[EriniumGroup] Erreur game:launch:', err.message);
       sendStatus(sender, 'error', err.message);
       return { success: false, error: err.message };
     }
@@ -2155,7 +2155,7 @@ function registerIpcHandlers() {
     try {
       return await fetchRemoteManifest();
     } catch (err) {
-      console.error('[EriniumFaction] Fetch manifest error:', err.message);
+      console.error('[EriniumGroup] Fetch manifest error:', err.message);
       return null;
     }
   });
@@ -2163,7 +2163,7 @@ function registerIpcHandlers() {
   // Game repair — force re-verify all files
   ipcMain.handle('game:repair', async (event) => {
     var sender = event.sender;
-    console.log('[EriniumFaction] Game repair requested');
+    console.log('[EriniumGroup] Game repair requested');
 
     try {
       // Delete local manifest to force full re-check
@@ -2176,7 +2176,7 @@ function registerIpcHandlers() {
       sendStatus(sender, 'checking', 'Reparation terminee');
       return { success: true };
     } catch (err) {
-      console.error('[EriniumFaction] Erreur game:repair:', err.message);
+      console.error('[EriniumGroup] Erreur game:repair:', err.message);
       return { success: false, error: err.message };
     }
   });
@@ -2186,7 +2186,7 @@ function registerIpcHandlers() {
     return store.get('settings', {
       ram: 4,
       javaPath: '',
-      gameDir: path.join(app.getPath('appData'), '.eriniumfaction'),
+      gameDir: path.join(app.getPath('appData'), '.eriniumgroup'),
       jvmArgs: '',
       closeOnLaunch: false,
       startWithWindows: false,
@@ -2467,11 +2467,11 @@ function createTray() {
   }
 
   tray = new Tray(trayIcon);
-  tray.setToolTip('EriniumFaction Launcher');
+  tray.setToolTip('EriniumGroup Launcher');
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Ouvrir EriniumFaction',
+      label: 'Ouvrir EriniumGroup',
       click: () => {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.show();

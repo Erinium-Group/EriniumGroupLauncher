@@ -349,8 +349,8 @@
           '</div>';
         item.addEventListener('click', function () {
           var newsUrl = article.slug
-            ? 'https://eriniumfaction.vercel.app/news/' + article.slug
-            : 'https://eriniumfaction.vercel.app/news';
+            ? 'https://eriniumgroup.vercel.app/news/' + article.slug
+            : 'https://eriniumgroup.vercel.app/news';
           window.launcher.shell.openExternal(newsUrl);
         });
         newsList.appendChild(item);
@@ -892,7 +892,7 @@
   // ---- Site link ----
   linkSite.addEventListener('click', function (e) {
     e.preventDefault();
-    window.launcher.shell.openExternal('https://eriniumfaction.vercel.app');
+    window.launcher.shell.openExternal('https://eriniumgroup.vercel.app');
   });
 
   // ---- Helpers ----

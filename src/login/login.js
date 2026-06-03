@@ -105,6 +105,6 @@
   // CGV link
   linkCgv.addEventListener('click', function (e) {
     e.preventDefault();
-    window.launcher.shell.openExternal('https://eriniumfaction.vercel.app/cgv');
+    window.launcher.shell.openExternal('https://eriniumgroup.vercel.app/cgv');
   });
 })();
