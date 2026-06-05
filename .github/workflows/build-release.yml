@@ -104,7 +104,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release edit "${{ needs.version.outputs.tag }}" \
-            --repo Erinium-Group/EriniumFaction-Launcher \
+            --repo Erinium-Group/EriniumGroupLauncher \
             --draft=false \
-            --title "EriniumFaction Launcher ${{ needs.version.outputs.version }}" \
+            --title "EriniumGroup Launcher ${{ needs.version.outputs.version }}" \
             --latest
