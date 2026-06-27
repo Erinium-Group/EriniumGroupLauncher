@@ -156,7 +156,7 @@ function fetchJSON(urlStr, headers) {
     function doFetch(reqUrl, redirectCount) {
       if (redirectCount > 5) return resolve(null);
       var mod = reqUrl.startsWith('https') ? https : http;
-      var options = { timeout: 8000 };
+      var options = { timeout: 20000 };
       if (headers && typeof headers === 'object') options.headers = headers;
       var req = mod.get(reqUrl, options, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
@@ -269,6 +269,7 @@ function createMainWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       devTools: !IS_PRODUCTION,
+      webviewTag: true,
     },
   });
   mainWindow.loadFile(path.join(__dirname, 'src', 'main', 'main.html'));
@@ -670,7 +671,18 @@ function ensureDir(dirPath) {
   try { fs.mkdirSync(dirPath, { recursive: true }); } catch (e) { if (e.code !== 'EEXIST') throw e; }
 }
 
-function fetchRemoteManifest() { return fetchJSON(MANIFEST_URL); }
+async function fetchRemoteManifest() {
+  for (var _i = 0; _i < 2; _i++) {
+    console.log('[Skyzer] Manifeste: tentative ' + (_i + 1) + '...');
+    var _r = await fetchJSON(MANIFEST_URL);
+    if (_r && Array.isArray(_r.files)) {
+      console.log('[Skyzer] Manifeste reçu: ' + _r.files.length + ' fichiers');
+      return _r;
+    }
+    console.warn('[Skyzer] Manifeste: tentative ' + (_i + 1) + ' échouée (null ou invalide)');
+  }
+  return null;
+}
 
 function loadLocalManifest() {
   var manifestPath = path.join(GAME_DIR, '.skyzer-manifest.json');
@@ -1094,63 +1106,33 @@ function readVarInt(buf, offset) {
   return { value: result, offset };
 }
 
-function pingMinecraftServer(host, port) {
+function pingMinecraftServer(host) {
   return new Promise(function (resolve) {
-    var timeout = setTimeout(function () {
-      socket.destroy();
-      resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
-    }, 5000);
-
-    var socket = net.createConnection({ host, port }, function () {
-      var startTime = Date.now();
-      var hostBuf = Buffer.from(host, 'utf8');
-      var hostLen = writeVarInt(hostBuf.length);
-
-      // Handshake packet (id=0x00, state=1)
-      var handshakeData = Buffer.concat([
-        writeVarInt(0x00),        // packet id
-        writeVarInt(763),          // protocol version (1.20.1)
-        hostLen, hostBuf,          // server address
-        Buffer.from([port >> 8, port & 0xFF]), // port big-endian
-        writeVarInt(1),            // next state: status
-      ]);
-      var handshake = Buffer.concat([writeVarInt(handshakeData.length), handshakeData]);
-
-      // Status request (id=0x00, empty)
-      var statusReq = Buffer.from([0x01, 0x00]);
-
-      socket.write(Buffer.concat([handshake, statusReq]));
-
-      var chunks = [];
-      socket.on('data', function (chunk) {
-        chunks.push(chunk);
-        var buf = Buffer.concat(chunks);
+    var apiUrl = 'https://api.mcstatus.io/v2/status/java/' + encodeURIComponent(host);
+    var req = https.get(apiUrl, { timeout: 8000 }, function (res) {
+      var data = '';
+      res.on('data', function (c) { data += c; });
+      res.on('end', function () {
         try {
-          var r1 = readVarInt(buf, 0);               // packet length
-          if (buf.length < r1.offset + r1.value) return; // incomplete
-          var r2 = readVarInt(buf, r1.offset);       // packet id
-          if (r2.value !== 0x00) return;
-          var r3 = readVarInt(buf, r2.offset);       // json string length
-          var jsonStr = buf.slice(r3.offset, r3.offset + r3.value).toString('utf8');
-          var data = JSON.parse(jsonStr);
-          clearTimeout(timeout);
-          socket.destroy();
-          resolve({
-            online: true,
-            players: (data.players && data.players.online) || 0,
-            max: (data.players && data.players.max) || 0,
-            motd: (data.description && (typeof data.description === 'string' ? data.description : data.description.text)) || '',
-            latency: Date.now() - startTime,
-            version: (data.version && data.version.name) || '',
-          });
-        } catch (e) { /* buffer incomplete, wait for more data */ }
+          var json = JSON.parse(data);
+          if (json.online) {
+            resolve({
+              online: true,
+              players: (json.players && json.players.online) || 0,
+              max: (json.players && json.players.max) || 0,
+              motd: '',
+              latency: json.latency || 0,
+            });
+          } else {
+            resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
+          }
+        } catch (e) {
+          resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
+        }
       });
     });
-
-    socket.on('error', function () {
-      clearTimeout(timeout);
-      resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
-    });
+    req.on('error', function () { resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 }); });
+    req.on('timeout', function () { req.destroy(); resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 }); });
   });
 }
 
@@ -1292,7 +1274,7 @@ function registerIpcHandlers() {
 
   // Server status — ping Minecraft Java Edition via handshake TCP
   ipcMain.handle('server:status', async () => {
-    return pingMinecraftServer('skyzerbeyondadventure.minesr.com', 25565);
+    return pingMinecraftServer('skyzerbeyondadventure.minesr.com');
   });
 
   // Map 3D — ouvre Bluemap dans une fenêtre in-launcher

@@ -70,57 +70,21 @@
 
     <!-- Content area -->
     <div class="content-area">
-      <!-- Ligne supérieure : info modpack + statut serveur -->
-      <div class="top-row fade-in-up">
-        <!-- Modpack info card -->
-        <div class="info-card glass-panel-sm">
-          <div class="modpack-header">
-            <div class="modpack-title-group">
-              <h2 class="modpack-name">Skyzer: Adventures Beyond</h2>
-              <p class="modpack-desc">Minecraft 1.20.1 — Forge — 300+ mods</p>
-            </div>
-            <div class="modpack-acts">
-              <span class="act-badge act1">Acte I</span>
-              <span class="act-badge act2">Acte II</span>
-              <span class="act-badge act3">Acte III</span>
-            </div>
-          </div>
-          <div class="modpack-pillars">
-            <div class="pillar">🌍 Exploration</div>
-            <div class="pillar">✨ Magie</div>
-            <div class="pillar">⚙️ Technologie</div>
-            <div class="pillar">🏗️ Construction</div>
-            <div class="pillar">🐾 Créatures</div>
-            <div class="pillar">📜 Quêtes</div>
-          </div>
-        </div>
-
-        <!-- Colonne droite : serveur + carte -->
-        <div class="side-cards">
-          <div class="server-card-mini glass-panel-sm" id="serverCard">
-            <div class="server-card-header">
-              <span class="card-mini-title">SERVEUR</span>
-              <span class="server-dot checking" id="serverDot"></span>
-            </div>
-            <div class="server-address">skyzerbeyondadventure.minesr.com</div>
-            <div class="server-info-row">
-              <span class="server-players-count" id="serverPlayers">—</span>
-              <span class="server-latency" id="serverLatency"></span>
-            </div>
-          </div>
-
-          <button class="btn-map glass-panel-sm" id="btnOpenMap">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-              <line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>
-            </svg>
-            Carte 3D du monde
-          </button>
-        </div>
+      <!-- Barre serveur compacte -->
+      <div class="server-bar">
+        <span class="server-dot checking" id="serverDot"></span>
+        <span class="server-bar-addr">skyzerbeyondadventure.minesr.com</span>
+        <span class="server-bar-players" id="serverPlayers">—</span>
+        <span class="server-bar-latency" id="serverLatency"></span>
       </div>
 
-      <!-- Play button -->
-      <div class="play-section fade-in-up" style="animation-delay: 0.15s">
+      <!-- Carte Bluemap intégrée -->
+      <webview class="map-webview"
+        src="https://badlands.mystrator.com/s/fd0eefa1-2228-4eb7-9acf-9532150b1edd/#overworld:-326:40:-353:241:-1.84:0.85:0:0:perspective"
+        allowpopups></webview>
+
+      <!-- Bouton jouer + progression -->
+      <div class="play-section fade-in-up">
         <button class="btn btn-play" id="btnPlay">
           <span id="playIcon">&#9654;</span>
           <span id="playText">JOUER</span>
