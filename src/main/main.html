@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EriniumGroup — Launcher</title>
+  <title>Skyzer: Adventures Beyond</title>
   <link rel="stylesheet" href="../shared/styles.css">
   <link rel="stylesheet" href="main.css">
 </head>
 <body>
   <!-- Custom titlebar -->
   <div class="titlebar">
-    <span class="titlebar-title">EriniumGroup Launcher</span>
+    <span class="titlebar-title">Skyzer: Adventures Beyond</span>
     <div class="titlebar-controls">
       <button class="titlebar-btn" id="btnMinimize" title="Minimiser">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -41,30 +41,7 @@
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22%3E%3Crect fill=%22%231A1830%22 width=%2280%22 height=%2280%22 rx=%2240%22/%3E%3Ctext x=%2240%22 y=%2248%22 text-anchor=%22middle%22 fill=%22%23C8A0FF%22 font-family=%22Inter%22 font-weight=%22700%22 font-size=%2228%22%3E%3F%3C/text%3E%3C/svg%3E'">
         </div>
         <h2 class="player-name" id="playerName">Joueur</h2>
-        <div class="player-rank" id="playerRank">
-          <span class="rank-badge">Joueur</span>
-        </div>
-        <p class="player-discord" id="playerDiscord">Discord#0000</p>
-      </div>
-
-      <!-- Player stats -->
-      <div class="stats-section">
-        <div class="stat-row">
-          <span class="stat-label">Faction</span>
-          <span class="stat-value" id="playerFaction">Aucune</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Kills</span>
-          <span class="stat-value" id="playerKills">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Deaths</span>
-          <span class="stat-value" id="playerDeaths">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">K/D</span>
-          <span class="stat-value" id="playerKD">0.00</span>
-        </div>
+        <p class="player-mc-label">Minecraft Java Edition</p>
       </div>
 
       <!-- Sidebar actions -->
@@ -80,66 +57,51 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
-          Parametres
+          Paramètres
         </button>
         <button class="sidebar-btn btn-logout" id="btnLogout">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
-          Deconnexion
+          Déconnexion
         </button>
       </div>
     </aside>
 
     <!-- Content area -->
     <div class="content-area">
-      <!-- Server status card -->
-      <div class="server-card glass-panel-sm fade-in-up">
-        <div class="server-card-header">
-          <h3 class="card-title">Statut Serveur</h3>
-          <div class="server-status-badge" id="serverStatusBadge">
-            <span class="status-dot offline" id="serverDot"></span>
-            <span class="server-status-text" id="serverStatusText">Hors ligne</span>
+      <!-- Modpack info card -->
+      <div class="info-card glass-panel-sm fade-in-up">
+        <div class="modpack-header">
+          <div class="modpack-title-group">
+            <h2 class="modpack-name">Skyzer: Adventures Beyond</h2>
+            <p class="modpack-desc">Minecraft 1.20.1 — Forge — 300+ mods</p>
+          </div>
+          <div class="modpack-acts">
+            <span class="act-badge act1">Acte I</span>
+            <span class="act-badge act2">Acte II</span>
+            <span class="act-badge act3">Acte III</span>
           </div>
         </div>
-        <div class="server-stats">
-          <div class="server-stat">
-            <span class="server-stat-label">Joueurs</span>
-            <span class="server-stat-value" id="serverPlayers">0 / 1000</span>
-          </div>
-          <div class="server-stat">
-            <span class="server-stat-label">TPS</span>
-            <span class="server-stat-value" id="serverTps">-</span>
-          </div>
-        </div>
-        <div class="player-bar">
-          <div class="player-bar-fill" id="playerBarFill" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <!-- News section -->
-      <div class="news-card glass-panel-sm fade-in-up" style="animation-delay: 0.1s">
-        <h3 class="card-title">Actualites</h3>
-        <div class="news-list" id="newsList">
-          <div class="news-loading">
-            <div class="spinner">
-              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            </div>
-            <span>Chargement des actualites...</span>
-          </div>
+        <div class="modpack-pillars">
+          <div class="pillar">🌍 Exploration</div>
+          <div class="pillar">✨ Magie</div>
+          <div class="pillar">⚙️ Technologie</div>
+          <div class="pillar">🏗️ Construction</div>
+          <div class="pillar">🐾 Créatures</div>
+          <div class="pillar">📜 Quêtes</div>
         </div>
       </div>
 
       <!-- Play button -->
-      <div class="play-section fade-in-up" style="animation-delay: 0.2s">
+      <div class="play-section fade-in-up" style="animation-delay: 0.15s">
         <button class="btn btn-play" id="btnPlay">
           <span id="playIcon">&#9654;</span>
           <span id="playText">JOUER</span>
         </button>
-        <!-- Progress bar (hidden by default) -->
         <div class="game-progress hidden" id="gameProgress">
           <div class="game-progress-header">
-            <span class="game-progress-label" id="gameProgressLabel">Verification...</span>
+            <span class="game-progress-label" id="gameProgressLabel">Vérification...</span>
             <span class="game-progress-percent" id="gameProgressPercent"></span>
           </div>
           <div class="game-progress-bar">
@@ -151,11 +113,11 @@
 
       <!-- Footer -->
       <div class="main-footer">
-        <span>EriniumGroup v<span id="footerVersion">1.0.0</span></span>
+        <span>Skyzer v<span id="footerVersion">1.0.0</span></span>
         <span class="footer-sep">&#183;</span>
-        <span>Minecraft 1.12.2 CleanRoom</span>
+        <span>Minecraft 1.20.1 Forge</span>
         <span class="footer-sep">&#183;</span>
-        <a href="#" id="linkSite">eriniumgroup.fr</a>
+        <a href="#" id="linkLogs">Ouvrir les logs</a>
       </div>
     </div>
   </div>
@@ -174,12 +136,12 @@
       </div>
       <div class="settings-body">
         <p class="setting-hint" style="margin-bottom: 16px">
-          Activez les mods que vous souhaitez utiliser. Ils seront telecharges au prochain lancement du jeu.
+          Activez les mods optionnels. Ils seront téléchargés au prochain lancement.
         </p>
         <div id="modsListContainer">
           <div class="news-loading">
             <div class="spinner"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <span>Chargement des mods disponibles...</span>
+            <span>Chargement...</span>
           </div>
         </div>
       </div>
@@ -194,7 +156,7 @@
     <div class="settings-backdrop" id="settingsBackdrop"></div>
     <div class="settings-panel glass-panel" id="settingsPanel">
       <div class="settings-header">
-        <h2 class="settings-title">Parametres</h2>
+        <h2 class="settings-title">Paramètres</h2>
         <button class="titlebar-btn close" id="btnCloseSettings">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>
@@ -205,15 +167,15 @@
       <div class="settings-body">
         <!-- RAM -->
         <div class="setting-group">
-          <label class="setting-label">RAM allouee</label>
+          <label class="setting-label">RAM allouée</label>
           <div class="setting-row">
-            <input type="range" class="setting-slider" id="settingRam" min="1" max="16" step="0.5" value="4">
+            <input type="range" class="setting-slider" id="settingRam" min="2" max="16" step="0.5" value="4">
             <span class="setting-value" id="settingRamValue">4 Go</span>
           </div>
-          <p class="setting-hint" id="settingRamHint">RAM systeme: calculer...</p>
+          <p class="setting-hint">Recommandé : 8-12 Go pour ce modpack</p>
         </div>
 
-        <!-- Java warning banner (hidden by default) -->
+        <!-- Avertissement Java -->
         <div class="java-warning-banner hidden" id="javaWarningBanner">
           <div class="java-warning-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,21 +184,21 @@
             </svg>
           </div>
           <div class="java-warning-text">
-            <strong>Java non detecte</strong>
-            <span>Java 21+ est requis pour lancer le jeu.</span>
+            <strong>Java 17+ non détecté</strong>
+            <span>Java 17 est requis pour Minecraft 1.20.1.</span>
           </div>
           <button class="btn btn-java-download" id="btnDownloadJava">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Telecharger Java
+            Télécharger Java 17
           </button>
         </div>
 
-        <!-- Java download progress (hidden by default) -->
+        <!-- Progression téléchargement Java -->
         <div class="java-download-progress hidden" id="javaDownloadProgress">
           <div class="java-dl-header">
-            <span class="java-dl-label" id="javaDlLabel">Telechargement de Java 21...</span>
+            <span class="java-dl-label" id="javaDlLabel">Téléchargement de Java 17...</span>
             <span class="java-dl-percent" id="javaDlPercent">0%</span>
           </div>
           <div class="java-dl-bar">
@@ -244,16 +206,16 @@
           </div>
         </div>
 
-        <!-- Java path -->
+        <!-- Chemin Java -->
         <div class="setting-group">
-          <label class="setting-label">Chemin Java</label>
+          <label class="setting-label">Chemin Java (17+)</label>
           <div class="setting-input-row">
-            <input type="text" class="setting-input" id="settingJavaPath" placeholder="Auto-detecte">
-            <button class="btn-setting-action" id="btnDetectJava" title="Auto-detecter Java">
+            <input type="text" class="setting-input" id="settingJavaPath" placeholder="Auto-détecté">
+            <button class="btn-setting-action" id="btnDetectJava" title="Auto-détecter Java">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              Detecter
+              Détecter
             </button>
             <button class="btn-setting-action" id="btnBrowseJava" title="Parcourir">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -262,17 +224,17 @@
               Parcourir
             </button>
           </div>
-          <p class="setting-hint" id="settingJavaHint">Chemin vers javaw.exe (Java 21+). Laissez vide pour auto-detection.</p>
+          <p class="setting-hint" id="settingJavaHint">Chemin vers javaw.exe (Java 17+). Laissez vide pour auto-détection.</p>
           <div class="java-version-info hidden" id="javaVersionInfo">
             <span class="java-version-badge" id="javaVersionBadge"></span>
           </div>
         </div>
 
-        <!-- Game directory -->
+        <!-- Répertoire du jeu -->
         <div class="setting-group">
-          <label class="setting-label">Repertoire du jeu</label>
+          <label class="setting-label">Répertoire du jeu</label>
           <div class="setting-input-row">
-            <input type="text" class="setting-input" id="settingGameDir" placeholder="%APPDATA%/.eriniumgroup">
+            <input type="text" class="setting-input" id="settingGameDir" placeholder="%APPDATA%/.skyzeradventure">
             <button class="btn-setting-action" id="btnBrowseDir" title="Parcourir">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
@@ -282,13 +244,13 @@
           </div>
         </div>
 
-        <!-- JVM Arguments -->
+        <!-- Arguments JVM -->
         <div class="setting-group">
           <label class="setting-label">Arguments JVM</label>
           <div class="setting-input-row">
             <input type="text" class="setting-input" id="settingJvmArgs" placeholder="Ex: -XX:+UseG1GC">
           </div>
-          <p class="setting-hint">Arguments JVM supplementaires (avance).</p>
+          <p class="setting-hint">Arguments JVM supplémentaires (avancé).</p>
         </div>
 
         <!-- Toggles -->

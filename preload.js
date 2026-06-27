@@ -2,19 +2,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('launcher', {
   auth: {
-    startDiscord: () => ipcRenderer.invoke('auth:start-discord'),
-    devLogin: () => ipcRenderer.invoke('auth:dev-login'),
+    startMicrosoft: () => ipcRenderer.invoke('auth:start-microsoft'),
     getSession: () => ipcRenderer.invoke('auth:get-session'),
-    getProfile: () => ipcRenderer.invoke('auth:get-profile'),
     logout: () => ipcRenderer.invoke('auth:logout'),
     onToken: (cb) => ipcRenderer.on('auth:token-received', (_e, data) => cb(data)),
     onError: (cb) => ipcRenderer.on('auth:error', (_e, data) => cb(data)),
-  },
-  server: {
-    getStatus: () => ipcRenderer.invoke('server:get-status'),
-  },
-  news: {
-    getLatest: () => ipcRenderer.invoke('news:get-latest'),
   },
   game: {
     launch: () => ipcRenderer.invoke('game:launch'),

@@ -1,10 +1,10 @@
 {
-  "name": "eriniumgroup-launcher",
-  "version": "1.2.2",
-  "description": "Launcher officiel EriniumGroup",
+  "name": "skyzer-launcher",
+  "version": "1.0.0",
+  "description": "Launcher officiel Skyzer: Adventures Beyond",
   "author": {
-    "name": "EriniumGroup",
-    "email": "contact@eriniumgroup.fr"
+    "name": "JLSkyzer",
+    "email": "killiandasneves4@gmail.com"
   },
   "main": "main.js",
   "scripts": {
@@ -16,8 +16,8 @@
     "build:all": "electron-builder --win --linux"
   },
   "build": {
-    "appId": "fr.eriniumgroup.launcher",
-    "productName": "EriniumGroup",
+    "appId": "com.skyzeradventure.launcher",
+    "productName": "Skyzer Launcher",
     "asar": true,
     "forceCodeSigning": false,
     "win": {

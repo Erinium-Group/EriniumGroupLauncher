@@ -1,0 +1,107 @@
+name: Build & Release — Skyzer Launcher
+
+on:
+  push:
+    branches: [skyzer]
+
+permissions:
+  contents: write
+
+jobs:
+  # Step 1: Bump version and create tag with skyzer- prefix
+  version:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore: bump version')"
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bump version
+        id: bump
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          if echo "$COMMIT_MSG" | grep -qi '\[major\]'; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+          elif echo "$COMMIT_MSG" | grep -qi '\[minor\]'; then
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+          else
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+
+          node -e "
+            const pkg = require('./package.json');
+            pkg.version = '$NEW_VERSION';
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=skyzer-v$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Bumped: $CURRENT -> $NEW_VERSION"
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }}"
+          git tag "${{ steps.bump.outputs.tag }}"
+          git push origin skyzer --tags
+
+  # Step 2: Build on all platforms
+  build:
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.tag }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: npx electron-builder --${{ matrix.platform }} --publish always
+
+  # Step 3: Publish draft release
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ needs.version.outputs.tag }}" \
+            --repo Erinium-Group/EriniumGroupLauncher \
+            --draft=false \
+            --title "Skyzer Launcher ${{ needs.version.outputs.version }}" \
+            --latest=false

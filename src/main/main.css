@@ -929,3 +929,119 @@
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
 }
+
+/* ============================================================
+   SKYZER — MODPACK INFO CARD
+   ============================================================ */
+
+.player-mc-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+
+.info-card {
+  padding: 20px 24px;
+  flex-shrink: 0;
+}
+
+.modpack-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modpack-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modpack-name {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.modpack-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+
+.modpack-acts {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.act-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.act1 {
+  background: rgba(46, 204, 113, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.act2 {
+  background: rgba(0, 229, 255, 0.10);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+}
+
+.act3 {
+  background: rgba(107, 47, 160, 0.15);
+  color: var(--primary-light);
+  border: 1px solid rgba(107, 47, 160, 0.35);
+}
+
+.modpack-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.pillar {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.pillar:hover {
+  background: rgba(107, 47, 160, 0.08);
+  border-color: rgba(107, 47, 160, 0.2);
+  color: var(--primary-light);
+}
+
+/* ---- Fade-in-up animation ---- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
