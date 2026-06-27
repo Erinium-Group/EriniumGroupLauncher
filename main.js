@@ -1253,6 +1253,7 @@ if (!gotLock) { app.quit(); } else {
 
     // Auto-updater
     try {
+      autoUpdater.channel = 'skyzer'; // fichier latest-skyzer.yml, séparé du launcher Erinium
       autoUpdater.on('checking-for-update', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:checking'); });
       autoUpdater.on('update-available', (info) => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:available', info); });
       autoUpdater.on('update-not-available', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:not-available'); });

@@ -22,7 +22,7 @@
     "forceCodeSigning": false,
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.png"
     },
     "mac": {
       "target": "dmg",
@@ -44,7 +44,8 @@
     "publish": {
       "provider": "github",
       "owner": "Erinium-Group",
-      "repo": "EriniumGroupLauncher"
+      "repo": "EriniumGroupLauncher",
+      "channel": "skyzer"
     }
   },
   "type": "commonjs",
