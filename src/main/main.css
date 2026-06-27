@@ -211,13 +211,20 @@
   opacity: 0.45;
 }
 
-/* ---- Webview carte ---- */
-webview.map-webview {
+/* ---- Conteneur carte ---- */
+.map-container {
   flex: 1;
   min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+webview.map-webview {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   border: none;
-  display: block;
 }
 
 /* ---- Play section (bas) ---- */
