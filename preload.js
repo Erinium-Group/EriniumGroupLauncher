@@ -52,6 +52,12 @@ contextBridge.exposeInMainWorld('launcher', {
     maximize: () => ipcRenderer.send('window:maximize'),
     close: () => ipcRenderer.send('window:close'),
   },
+  server: {
+    getStatus: () => ipcRenderer.invoke('server:status'),
+  },
+  map: {
+    open: () => ipcRenderer.invoke('map:open'),
+  },
   update: {
     check: () => ipcRenderer.invoke('update:check'),
     install: () => ipcRenderer.invoke('update:install'),

@@ -70,26 +70,52 @@
 
     <!-- Content area -->
     <div class="content-area">
-      <!-- Modpack info card -->
-      <div class="info-card glass-panel-sm fade-in-up">
-        <div class="modpack-header">
-          <div class="modpack-title-group">
-            <h2 class="modpack-name">Skyzer: Adventures Beyond</h2>
-            <p class="modpack-desc">Minecraft 1.20.1 — Forge — 300+ mods</p>
+      <!-- Ligne supérieure : info modpack + statut serveur -->
+      <div class="top-row fade-in-up">
+        <!-- Modpack info card -->
+        <div class="info-card glass-panel-sm">
+          <div class="modpack-header">
+            <div class="modpack-title-group">
+              <h2 class="modpack-name">Skyzer: Adventures Beyond</h2>
+              <p class="modpack-desc">Minecraft 1.20.1 — Forge — 300+ mods</p>
+            </div>
+            <div class="modpack-acts">
+              <span class="act-badge act1">Acte I</span>
+              <span class="act-badge act2">Acte II</span>
+              <span class="act-badge act3">Acte III</span>
+            </div>
           </div>
-          <div class="modpack-acts">
-            <span class="act-badge act1">Acte I</span>
-            <span class="act-badge act2">Acte II</span>
-            <span class="act-badge act3">Acte III</span>
+          <div class="modpack-pillars">
+            <div class="pillar">🌍 Exploration</div>
+            <div class="pillar">✨ Magie</div>
+            <div class="pillar">⚙️ Technologie</div>
+            <div class="pillar">🏗️ Construction</div>
+            <div class="pillar">🐾 Créatures</div>
+            <div class="pillar">📜 Quêtes</div>
           </div>
         </div>
-        <div class="modpack-pillars">
-          <div class="pillar">🌍 Exploration</div>
-          <div class="pillar">✨ Magie</div>
-          <div class="pillar">⚙️ Technologie</div>
-          <div class="pillar">🏗️ Construction</div>
-          <div class="pillar">🐾 Créatures</div>
-          <div class="pillar">📜 Quêtes</div>
+
+        <!-- Colonne droite : serveur + carte -->
+        <div class="side-cards">
+          <div class="server-card-mini glass-panel-sm" id="serverCard">
+            <div class="server-card-header">
+              <span class="card-mini-title">SERVEUR</span>
+              <span class="server-dot checking" id="serverDot"></span>
+            </div>
+            <div class="server-address">skyzerbeyondadventure.minesr.com</div>
+            <div class="server-info-row">
+              <span class="server-players-count" id="serverPlayers">—</span>
+              <span class="server-latency" id="serverLatency"></span>
+            </div>
+          </div>
+
+          <button class="btn-map glass-panel-sm" id="btnOpenMap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+              <line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>
+            </svg>
+            Carte 3D du monde
+          </button>
         </div>
       </div>
 

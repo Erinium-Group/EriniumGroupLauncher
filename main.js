@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, shell, safeStorage, nativeImage, Tray, Menu, dialog } = require('electron');
+const net = require('net');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
@@ -1069,6 +1070,91 @@ async function launchGame(webContents, settings) {
 }
 
 // ---------------------------------------------------------------------------
+// Minecraft server ping (Java Edition status protocol)
+// ---------------------------------------------------------------------------
+function writeVarInt(value) {
+  var bytes = [];
+  do {
+    var b = value & 0x7F;
+    value >>>= 7;
+    if (value !== 0) b |= 0x80;
+    bytes.push(b);
+  } while (value !== 0);
+  return Buffer.from(bytes);
+}
+
+function readVarInt(buf, offset) {
+  var result = 0, shift = 0, byte;
+  do {
+    if (offset >= buf.length) throw new Error('VarInt incomplete');
+    byte = buf[offset++];
+    result |= (byte & 0x7F) << shift;
+    shift += 7;
+  } while (byte & 0x80);
+  return { value: result, offset };
+}
+
+function pingMinecraftServer(host, port) {
+  return new Promise(function (resolve) {
+    var timeout = setTimeout(function () {
+      socket.destroy();
+      resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
+    }, 5000);
+
+    var socket = net.createConnection({ host, port }, function () {
+      var startTime = Date.now();
+      var hostBuf = Buffer.from(host, 'utf8');
+      var hostLen = writeVarInt(hostBuf.length);
+
+      // Handshake packet (id=0x00, state=1)
+      var handshakeData = Buffer.concat([
+        writeVarInt(0x00),        // packet id
+        writeVarInt(763),          // protocol version (1.20.1)
+        hostLen, hostBuf,          // server address
+        Buffer.from([port >> 8, port & 0xFF]), // port big-endian
+        writeVarInt(1),            // next state: status
+      ]);
+      var handshake = Buffer.concat([writeVarInt(handshakeData.length), handshakeData]);
+
+      // Status request (id=0x00, empty)
+      var statusReq = Buffer.from([0x01, 0x00]);
+
+      socket.write(Buffer.concat([handshake, statusReq]));
+
+      var chunks = [];
+      socket.on('data', function (chunk) {
+        chunks.push(chunk);
+        var buf = Buffer.concat(chunks);
+        try {
+          var r1 = readVarInt(buf, 0);               // packet length
+          if (buf.length < r1.offset + r1.value) return; // incomplete
+          var r2 = readVarInt(buf, r1.offset);       // packet id
+          if (r2.value !== 0x00) return;
+          var r3 = readVarInt(buf, r2.offset);       // json string length
+          var jsonStr = buf.slice(r3.offset, r3.offset + r3.value).toString('utf8');
+          var data = JSON.parse(jsonStr);
+          clearTimeout(timeout);
+          socket.destroy();
+          resolve({
+            online: true,
+            players: (data.players && data.players.online) || 0,
+            max: (data.players && data.players.max) || 0,
+            motd: (data.description && (typeof data.description === 'string' ? data.description : data.description.text)) || '',
+            latency: Date.now() - startTime,
+            version: (data.version && data.version.name) || '',
+          });
+        } catch (e) { /* buffer incomplete, wait for more data */ }
+      });
+    });
+
+    socket.on('error', function () {
+      clearTimeout(timeout);
+      resolve({ online: false, players: 0, max: 0, motd: '', latency: 0 });
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
 // IPC Handlers
 // ---------------------------------------------------------------------------
 function registerIpcHandlers() {
@@ -1202,6 +1288,25 @@ function registerIpcHandlers() {
   ipcMain.handle('shell:open-external', async (event, urlStr) => {
     try { await shell.openExternal(urlStr); return { success: true }; }
     catch (e) { return { success: false, error: e.message }; }
+  });
+
+  // Server status — ping Minecraft Java Edition via handshake TCP
+  ipcMain.handle('server:status', async () => {
+    return pingMinecraftServer('skyzerbeyondadventure.minesr.com', 25565);
+  });
+
+  // Map 3D — ouvre Bluemap dans une fenêtre in-launcher
+  ipcMain.handle('map:open', async () => {
+    var mapUrl = 'https://badlands.mystrator.com/s/fd0eefa1-2228-4eb7-9acf-9532150b1edd/#overworld:-326:40:-353:241:-1.84:0.85:0:0:perspective';
+    var mapWin = new BrowserWindow({
+      width: 1280, height: 800,
+      title: 'Skyzer — Carte du monde',
+      icon: path.join(__dirname, 'assets', 'icon.png'),
+      autoHideMenuBar: true,
+      webPreferences: { nodeIntegration: false, contextIsolation: true },
+    });
+    mapWin.loadURL(mapUrl);
+    return { success: true };
   });
 
   // Nav

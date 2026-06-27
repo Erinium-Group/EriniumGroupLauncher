@@ -41,6 +41,11 @@
   var javaDlPercent = document.getElementById('javaDlPercent');
   var javaDlBarFill = document.getElementById('javaDlBarFill');
 
+  var serverDot = document.getElementById('serverDot');
+  var serverPlayers = document.getElementById('serverPlayers');
+  var serverLatency = document.getElementById('serverLatency');
+  var btnOpenMap = document.getElementById('btnOpenMap');
+
   var modsOverlay = document.getElementById('modsOverlay');
   var modsBackdrop = document.getElementById('modsBackdrop');
   var btnOptionalMods = document.getElementById('btnOptionalMods');
@@ -66,7 +71,35 @@
     loadVersion();
     loadProfile();
     loadSettings();
+    loadServerStatus();
+    setInterval(loadServerStatus, 60000);
   }
+
+  // ---- Server status ----
+  function loadServerStatus() {
+    serverDot.className = 'server-dot checking';
+    serverPlayers.textContent = '—';
+    serverLatency.textContent = '';
+    window.launcher.server.getStatus().then(function (s) {
+      if (s && s.online) {
+        serverDot.className = 'server-dot online';
+        serverPlayers.textContent = s.players + ' / ' + s.max + ' joueurs';
+        serverLatency.textContent = s.latency + ' ms';
+      } else {
+        serverDot.className = 'server-dot offline';
+        serverPlayers.textContent = 'Hors ligne';
+        serverLatency.textContent = '';
+      }
+    }).catch(function () {
+      serverDot.className = 'server-dot offline';
+      serverPlayers.textContent = 'Hors ligne';
+    });
+  }
+
+  // ---- Carte 3D ----
+  btnOpenMap.addEventListener('click', function () {
+    window.launcher.map.open();
+  });
 
   function loadVersion() {
     window.launcher.app.getVersion().then(function (v) {
