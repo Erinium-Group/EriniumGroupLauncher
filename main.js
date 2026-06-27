@@ -1041,8 +1041,10 @@ async function launchGame(webContents, settings) {
         build: 'latest',
         enable: true,
       },
-      verify: true,
-      ignored: ['mods', 'config', 'resourcepacks', 'saves', 'screenshots', 'shaderpacks', 'schematics'],
+      verify: false,
+      ignored: ['mods', 'config', 'resourcepacks', 'saves', 'screenshots', 'shaderpacks', 'schematics',
+                'options.txt', 'servers.dat', 'usercache.json', 'realms_persistence.json',
+                'logs', 'crash-reports', 'replay_recordings'],
       JVM_ARGS: jvmArgs,
       GAME_ARGS: [],
       java: { path: javaPath, type: 'jre' },
@@ -1122,6 +1124,16 @@ function registerIpcHandlers() {
     if (gameProcess) return { success: false, error: 'Le jeu est déjà en cours d\'exécution' };
     try {
       var result = await checkAndDownloadGame(sender);
+      // Si pas de manifeste ET pas de mods locaux → refuser le lancement
+      if (!result.manifest) {
+        var modsDir = path.join(GAME_DIR, 'mods');
+        var hasLocalMods = fs.existsSync(modsDir) && fs.readdirSync(modsDir).some(function (f) { return f.endsWith('.jar'); });
+        if (!hasLocalMods) {
+          var offlineErr = 'Impossible de récupérer le manifeste et aucun mod local trouvé. Vérifiez votre connexion.';
+          sendStatus(sender, 'error', offlineErr);
+          return { success: false, error: offlineErr };
+        }
+      }
       var settings = store.get('settings', getDefaultSettings());
       await launchGame(sender, settings);
       return { success: true };
@@ -1251,9 +1263,13 @@ if (!gotLock) { app.quit(); } else {
     registerIpcHandlers();
     createSplashWindow();
 
-    // Auto-updater
+    // Auto-updater — generic provider pour éviter la dépendance à la release "latest" Erinium
     try {
-      autoUpdater.channel = 'skyzer'; // fichier latest-skyzer.yml, séparé du launcher Erinium
+      autoUpdater.setFeedURL({
+        provider: 'generic',
+        url: SITE_URL + '/api/skyzer/update',
+        channel: 'skyzer',
+      });
       autoUpdater.on('checking-for-update', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:checking'); });
       autoUpdater.on('update-available', (info) => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:available', info); });
       autoUpdater.on('update-not-available', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:not-available'); });
