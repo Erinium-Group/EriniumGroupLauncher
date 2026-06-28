@@ -73,7 +73,7 @@
       <!-- Barre serveur compacte -->
       <div class="server-bar">
         <span class="server-dot checking" id="serverDot"></span>
-        <span class="server-bar-addr">skyzerbeyondadventure.minesr.com</span>
+        <span class="server-bar-addr">skyzerbeyondadventurev2.minesr.com</span>
         <span class="server-bar-players" id="serverPlayers">—</span>
         <span class="server-bar-latency" id="serverLatency"></span>
       </div>
@@ -164,7 +164,7 @@
             <input type="range" class="setting-slider" id="settingRam" min="2" max="16" step="0.5" value="4">
             <span class="setting-value" id="settingRamValue">4 Go</span>
           </div>
-          <p class="setting-hint">Recommandé : 8-12 Go pour ce modpack</p>
+          <p class="setting-hint" id="settingRamHint">Recommandé : 8-12 Go pour ce modpack</p>
         </div>
 
         <!-- Avertissement Java -->
@@ -241,6 +241,12 @@
           <label class="setting-label">Arguments JVM</label>
           <div class="setting-input-row">
             <input type="text" class="setting-input" id="settingJvmArgs" placeholder="Ex: -XX:+UseG1GC">
+            <button class="btn-setting-action" id="btnOptimizeArgs" title="Remplir avec les arguments optimisés pour ce modpack">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              Optimiser
+            </button>
           </div>
           <p class="setting-hint">Arguments JVM supplémentaires (avancé).</p>
         </div>

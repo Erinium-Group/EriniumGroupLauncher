@@ -58,6 +58,9 @@ contextBridge.exposeInMainWorld('launcher', {
   map: {
     open: () => ipcRenderer.invoke('map:open'),
   },
+  system: {
+    getRam: () => ipcRenderer.invoke('system:get-ram'),
+  },
   update: {
     check: () => ipcRenderer.invoke('update:check'),
     install: () => ipcRenderer.invoke('update:install'),

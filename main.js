@@ -1274,12 +1274,12 @@ function registerIpcHandlers() {
 
   // Server status — ping Minecraft Java Edition via handshake TCP
   ipcMain.handle('server:status', async () => {
-    return pingMinecraftServer('skyzerbeyondadventure.minesr.com');
+    return pingMinecraftServer('skyzerbeyondadventurev2.minesr.com');
   });
 
   // Map 3D — ouvre Bluemap dans une fenêtre in-launcher
   ipcMain.handle('map:open', async () => {
-    var mapUrl = 'https://badlands.mystrator.com/s/fd0eefa1-2228-4eb7-9acf-9532150b1edd/#overworld:-326:40:-353:241:-1.84:0.85:0:0:perspective';
+    var mapUrl = 'https://badlands.mystrator.com/s/fd0eefa1-2228-4eb7-9acf-9532150b1edd/';
     var mapWin = new BrowserWindow({
       width: 1280, height: 800,
       title: 'Skyzer — Carte du monde',
@@ -1315,6 +1315,7 @@ function registerIpcHandlers() {
   // Auto-updater
   ipcMain.handle('update:check', async () => { try { autoUpdater.checkForUpdates(); return { success: true }; } catch (e) { return { success: false, error: e.message }; } });
   ipcMain.handle('update:install', async () => { autoUpdater.quitAndInstall(); });
+  ipcMain.handle('system:get-ram', async () => Math.floor(os.totalmem() / (1024 * 1024 * 1024)));
 }
 
 // ---------------------------------------------------------------------------

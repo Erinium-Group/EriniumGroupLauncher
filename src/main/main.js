@@ -32,6 +32,8 @@
   var btnDetectJava = document.getElementById('btnDetectJava');
   var btnBrowseJava = document.getElementById('btnBrowseJava');
   var btnBrowseDir = document.getElementById('btnBrowseDir');
+  var btnOptimizeArgs = document.getElementById('btnOptimizeArgs');
+  var settingRamHint = document.getElementById('settingRamHint');
   var javaVersionInfo = document.getElementById('javaVersionInfo');
   var javaVersionBadge = document.getElementById('javaVersionBadge');
   var javaWarningBanner = document.getElementById('javaWarningBanner');
@@ -276,6 +278,11 @@
 
   // ---- Settings ----
   function loadSettings() {
+    window.launcher.system.getRam().then(function (totalGb) {
+      var maxRam = Math.max(16, totalGb);
+      settingRam.max = maxRam;
+      settingRamHint.textContent = 'RAM disponible : ' + totalGb + ' Go — Recommandé : 8-12 Go pour ce modpack';
+    });
     window.launcher.settings.get().then(function (s) {
       settingRam.value = s.ram || 4;
       settingRamValue.textContent = (s.ram || 4) + ' Go';
@@ -412,6 +419,11 @@
     window.launcher.settings.browseDir().then(function (result) {
       if (result && !result.canceled) settingGameDir.value = result.path;
     });
+  });
+  btnOptimizeArgs.addEventListener('click', function () {
+    var ram = parseFloat(settingRam.value) || 4;
+    var regionSize = ram >= 16 ? '16M' : ram >= 8 ? '8M' : '4M';
+    settingJvmArgs.value = '-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=' + regionSize + ' -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1';
   });
   btnDownloadJava.addEventListener('click', startJavaDownload);
   btnSettings.addEventListener('click', openSettings);
